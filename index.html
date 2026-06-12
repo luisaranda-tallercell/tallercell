@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TallerCell — Sistema de Gestión para Talleres de Reparación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080C12;
+  --surface:#0D1520;
+  --surface2:#111D2E;
+  --border:#1C2E45;
+  --accent:#F5A623;
+  --accent2:#E09410;
+  --accent-glow:rgba(245,166,35,0.15);
+  --text:#E8EEF8;
+  --muted:#5A7090;
+  --green:#22C55E;
+  --blue:#3B82F6;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  cursor:default;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 48px;
+  background:rgba(8,12,18,0.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;letter-spacing:2px;
+  color:var(--text);
+}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;
+  transition:color .2s;letter-spacing:.3px;
+}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{
+  background:var(--accent);color:#000;
+  padding:10px 22px;border-radius:6px;
+  font-weight:700;font-size:14px;text-decoration:none;
+  transition:all .2s;letter-spacing:.3px;
+}
+.nav-cta:hover{background:var(--accent2);transform:translateY(-1px)}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+  padding:120px 24px 80px;
+  position:relative;overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,166,35,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(59,130,246,0.06) 0%, transparent 50%);
+}
+.hero-grid{
+  position:absolute;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(28,46,69,0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28,46,69,0.3) 1px, transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 50%, black 40%, transparent 80%);
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.3);
+  padding:6px 16px;border-radius:20px;margin-bottom:28px;
+  font-size:12px;font-weight:600;color:var(--accent);
+  letter-spacing:1px;text-transform:uppercase;
+  animation:fadeUp .8s ease both;
+}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
+
+.hero-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(64px,10vw,140px);
+  line-height:.9;letter-spacing:2px;
+  color:var(--text);
+  position:relative;z-index:1;
+  animation:fadeUp .8s .1s ease both;
+}
+.hero-title span{color:var(--accent)}
+.hero-subtitle{
+  font-size:clamp(16px,2.5vw,22px);
+  color:var(--muted);font-weight:300;
+  max-width:580px;line-height:1.6;
+  margin:20px auto 0;
+  position:relative;z-index:1;
+  animation:fadeUp .8s .2s ease both;
+}
+.hero-subtitle strong{color:var(--text);font-weight:500}
+
+.hero-stats{
+  display:flex;gap:48px;margin:48px 0;
+  position:relative;z-index:1;
+  animation:fadeUp .8s .3s ease both;
+}
+.hero-stat-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:48px;color:var(--accent);line-height:1;
+}
+.hero-stat-label{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:.5px;text-transform:uppercase}
+
+.hero-actions{
+  display:flex;gap:16px;flex-wrap:wrap;justify-content:center;
+  position:relative;z-index:1;
+  animation:fadeUp .8s .4s ease both;
+}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent);color:#000;
+  padding:16px 32px;border-radius:8px;
+  font-weight:700;font-size:16px;text-decoration:none;
+  transition:all .2s;letter-spacing:.3px;
+}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 12px 40px rgba(245,166,35,0.3)}
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:8px;
+  background:transparent;color:var(--text);
+  padding:16px 32px;border-radius:8px;border:1px solid var(--border);
+  font-weight:600;font-size:16px;text-decoration:none;
+  transition:all .2s;
+}
+.btn-secondary:hover{border-color:var(--muted);transform:translateY(-2px)}
+
+.hero-scroll{
+  position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+  color:var(--muted);font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  animation:fadeUp .8s .6s ease both;
+}
+.hero-scroll::after{
+  content:'';width:1px;height:40px;
+  background:linear-gradient(var(--accent),transparent);
+  animation:scrollLine 2s infinite;
+}
+@keyframes scrollLine{0%{opacity:0;transform:scaleY(0);transform-origin:top}50%{opacity:1}100%{opacity:0;transform:scaleY(1);transform-origin:bottom}}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SECTION BASE ── */
+section{padding:100px 24px}
+.container{max-width:1100px;margin:0 auto}
+.section-label{
+  font-size:11px;font-weight:700;color:var(--accent);
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;
+}
+.section-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(40px,6vw,72px);
+  line-height:1;color:var(--text);
+  margin-bottom:16px;
+}
+.section-title span{color:var(--accent)}
+.section-sub{
+  font-size:17px;color:var(--muted);
+  max-width:520px;line-height:1.6;font-weight:300;
+}
+
+/* ── PROBLEMA/SOLUCION ── */
+.problem-section{background:var(--surface)}
+.problem-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:48px;
+  align-items:center;margin-top:60px;
+}
+.problem-list{display:flex;flex-direction:column;gap:16px}
+.problem-item{
+  display:flex;gap:16px;align-items:flex-start;
+  padding:20px;background:rgba(232,69,60,0.05);
+  border:1px solid rgba(232,69,60,0.15);border-radius:8px;
+}
+.problem-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.problem-text h4{font-size:15px;font-weight:600;margin-bottom:4px;color:var(--text)}
+.problem-text p{font-size:13px;color:var(--muted);line-height:1.5}
+.solution-card{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:36px;position:relative;overflow:hidden;
+}
+.solution-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),transparent);
+}
+.solution-card h3{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:36px;color:var(--accent);margin-bottom:16px;
+}
+.solution-item{
+  display:flex;gap:12px;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--border);
+  font-size:14px;color:var(--muted);
+}
+.solution-item:last-child{border:none}
+.solution-item::before{content:'✓';color:var(--green);font-weight:700;font-size:16px;flex-shrink:0}
+
+/* ── FEATURES ── */
+.features-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:60px;
+}
+.feature-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:28px;
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.feature-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--accent-glow),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.feature-card:hover{border-color:rgba(245,166,35,0.4);transform:translateY(-4px)}
+.feature-card:hover::after{opacity:1}
+.feature-icon{
+  font-size:32px;margin-bottom:16px;
+  display:block;position:relative;z-index:1;
+}
+.feature-card h3{
+  font-size:17px;font-weight:700;margin-bottom:8px;
+  color:var(--text);position:relative;z-index:1;
+}
+.feature-card p{
+  font-size:13px;color:var(--muted);line-height:1.6;
+  position:relative;z-index:1;
+}
+.feature-tag{
+  display:inline-block;margin-top:12px;
+  background:rgba(245,166,35,0.1);color:var(--accent);
+  padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;position:relative;z-index:1;
+}
+
+/* ── PLATAFORMAS ── */
+.platforms-section{background:var(--surface)}
+.platforms-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:60px}
+.platform-card{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:12px;padding:36px;text-align:center;
+  transition:all .3s;
+}
+.platform-card:hover{border-color:rgba(245,166,35,0.4);transform:translateY(-4px)}
+.platform-icon{font-size:56px;margin-bottom:16px;display:block}
+.platform-card h3{
+  font-family:'Bebas Neue',sans-serif;font-size:32px;
+  margin-bottom:8px;color:var(--text);
+}
+.platform-card p{font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.5}
+.platform-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);
+  color:var(--green);padding:6px 14px;border-radius:20px;
+  font-size:12px;font-weight:700;
+}
+
+/* ── TRIAL / PRICING ── */
+.pricing-section{position:relative;overflow:hidden}
+.pricing-section::before{
+  content:'';position:absolute;top:-50%;left:50%;transform:translateX(-50%);
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(var(--accent-glow),transparent 70%);
+  pointer-events:none;
+}
+.pricing-card{
+  background:var(--surface);border:2px solid var(--accent);
+  border-radius:16px;max-width:540px;margin:60px auto 0;
+  overflow:hidden;position:relative;
+}
+.pricing-header{
+  background:linear-gradient(135deg,rgba(245,166,35,0.15),transparent);
+  padding:40px;text-align:center;border-bottom:1px solid var(--border);
+}
+.pricing-header h3{
+  font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--accent);
+  line-height:1;margin-bottom:4px;
+}
+.pricing-header p{font-size:14px;color:var(--muted)}
+.pricing-price{
+  font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--text);
+  line-height:1;margin:20px 0 4px;
+}
+.pricing-price span{font-size:32px;color:var(--muted)}
+.pricing-body{padding:40px}
+.pricing-feature{
+  display:flex;gap:14px;align-items:center;
+  padding:12px 0;border-bottom:1px solid var(--border);
+  font-size:15px;color:var(--muted);
+}
+.pricing-feature:last-child{border:none}
+.pricing-feature strong{color:var(--text)}
+.pricing-feature::before{content:'✓';color:var(--green);font-weight:700;font-size:18px;flex-shrink:0}
+.pricing-cta{
+  display:block;text-align:center;
+  background:var(--accent);color:#000;
+  padding:18px;font-weight:700;font-size:18px;
+  text-decoration:none;margin-top:28px;border-radius:8px;
+  transition:all .2s;letter-spacing:.3px;
+}
+.pricing-cta:hover{background:var(--accent2);transform:translateY(-2px)}
+
+/* ── COMO FUNCIONA ── */
+.steps-section{background:var(--surface)}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:60px;position:relative}
+.steps-grid::before{
+  content:'';position:absolute;top:32px;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border),var(--border),transparent);
+  z-index:0;
+}
+.step-card{text-align:center;position:relative;z-index:1}
+.step-num{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+  font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);
+}
+.step-card h4{font-size:15px;font-weight:700;margin-bottom:8px}
+.step-card p{font-size:13px;color:var(--muted);line-height:1.5}
+
+/* ── TESTIMONIAL / CONTEXTO ── */
+.context-section{text-align:center;padding:80px 24px}
+.context-quote{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(28px,5vw,56px);
+  line-height:1.1;max-width:800px;margin:0 auto 40px;
+  color:var(--text);
+}
+.context-quote span{color:var(--accent)}
+.context-tags{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:32px}
+.context-tag{
+  background:var(--surface);border:1px solid var(--border);
+  padding:8px 18px;border-radius:20px;
+  font-size:13px;color:var(--muted);font-weight:500;
+}
+
+/* ── FAQ ── */
+.faq-grid{max-width:720px;margin:60px auto 0}
+.faq-item{
+  border-bottom:1px solid var(--border);overflow:hidden;
+}
+.faq-q{
+  width:100%;background:none;border:none;color:var(--text);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 0;font-size:15px;font-weight:600;cursor:pointer;
+  text-align:left;gap:16px;transition:color .2s;
+  font-family:'DM Sans',sans-serif;
+}
+.faq-q:hover{color:var(--accent)}
+.faq-q .faq-icon{
+  flex-shrink:0;width:24px;height:24px;
+  background:var(--surface);border:1px solid var(--border);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:all .3s;color:var(--accent);
+}
+.faq-item.open .faq-icon{transform:rotate(45deg);background:var(--accent);color:#000;border-color:var(--accent)}
+.faq-a{
+  max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s;
+  font-size:14px;color:var(--muted);line-height:1.7;
+}
+.faq-item.open .faq-a{max-height:200px;padding-bottom:20px}
+
+/* ── CONTACT / CTA FINAL ── */
+.cta-section{
+  background:var(--surface);text-align:center;
+  padding:100px 24px;position:relative;overflow:hidden;
+}
+.cta-section::before{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:800px;height:400px;
+  background:radial-gradient(var(--accent-glow),transparent 70%);
+  pointer-events:none;
+}
+.cta-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(48px,8vw,100px);
+  color:var(--text);line-height:.9;
+  position:relative;z-index:1;
+}
+.cta-title span{color:var(--accent)}
+.cta-sub{font-size:17px;color:var(--muted);margin:20px auto 40px;max-width:480px;line-height:1.6;position:relative;z-index:1}
+.cta-email{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'JetBrains Mono',monospace;font-size:14px;
+  color:var(--accent);background:rgba(245,166,35,0.1);
+  border:1px solid rgba(245,166,35,0.3);
+  padding:10px 20px;border-radius:6px;text-decoration:none;
+  margin-top:16px;transition:all .2s;position:relative;z-index:1;
+}
+.cta-email:hover{background:rgba(245,166,35,0.2)}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--bg);border-top:1px solid var(--border);
+  padding:40px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px}
+.footer-logo span{color:var(--accent)}
+.footer-copy{font-size:12px;color:var(--muted)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:13px;color:var(--muted);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--text)}
+
+/* ── REVEAL ANIMATION ── */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  nav{padding:14px 20px}
+  .nav-links{display:none}
+  .hero-stats{gap:24px;flex-wrap:wrap;justify-content:center}
+  .problem-grid,.platforms-grid,.features-grid,.steps-grid{grid-template-columns:1fr}
+  .steps-grid::before{display:none}
+  footer{flex-direction:column;text-align:center;padding:32px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <div class="nav-logo">Taller<span>Cell</span></div>
+  <ul class="nav-links">
+    <li><a href="#funciones">Funciones</a></li>
+    <li><a href="#como-funciona">Como funciona</a></li>
+    <li><a href="#precios">Precios</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <a href="#descargar" class="nav-cta">⬇ Descargar gratis</a>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-badge">
+    <span></span>Prueba gratuita 15 dias — Sin tarjeta de credito
+  </div>
+
+  <h1 class="hero-title">
+    Tu taller,<br><span>bajo control.</span>
+  </h1>
+
+  <p class="hero-subtitle">
+    El sistema de gestion para talleres de reparacion de celulares y electronica.
+    <strong>Simple, rapido y sin internet.</strong>
+    Funciona en Linux y Windows.
+  </p>
+
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-num">15</div>
+      <div class="hero-stat-label">Dias de prueba</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">100%</div>
+      <div class="hero-stat-label">Sin internet</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">2</div>
+      <div class="hero-stat-label">Plataformas</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">3</div>
+      <div class="hero-stat-label">Idiomas</div>
+    </div>
+  </div>
+
+  <div class="hero-actions">
+    <a href="#descargar" class="btn-primary">⬇ Descargar ahora — es gratis</a>
+    <a href="#funciones" class="btn-secondary">Ver todas las funciones →</a>
+  </div>
+
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- ══ PROBLEMA / SOLUCIÓN ══ -->
+<section class="problem-section" id="problema">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">El problema</div>
+      <h2 class="section-title">¿Cómo manejas tu<br><span>taller hoy?</span></h2>
+    </div>
+    <div class="problem-grid reveal">
+      <div class="problem-list">
+        <div class="problem-item">
+          <span class="problem-icon">📋</span>
+          <div class="problem-text">
+            <h4>Anotaciones en papel</h4>
+            <p>Perdes datos, no encontras que equipo era de quien, y los papeles se borran o se pierden.</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <span class="problem-icon">💸</span>
+          <div class="problem-text">
+            <h4>Sin control de gastos ni ganancias</h4>
+            <p>No sabes cuanto ganas realmente por mes. Los gastos se mezclan y no tenes un numero claro.</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <span class="problem-icon">😤</span>
+          <div class="problem-text">
+            <h4>Clientes que preguntan todo el tiempo</h4>
+            <p>"¿Como va mi celular?" — y vos tenes que buscar entre papeles para dar una respuesta.</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <span class="problem-icon">📸</span>
+          <div class="problem-text">
+            <h4>Reclamos por rayones que ya venian</h4>
+            <p>Sin foto de ingreso, el cliente siempre tiene razon. Y eso cuesta tiempo y dinero.</p>
+          </div>
+        </div>
+      </div>
+      <div class="solution-card">
+        <h3>TallerCell lo resuelve todo</h3>
+        <div class="solution-item">Registro digital de cada reparacion con codigo unico</div>
+        <div class="solution-item">Control de cobros, gastos y ganancia neta por mes</div>
+        <div class="solution-item">Historial completo de cada cliente y su equipo</div>
+        <div class="solution-item">Fotos de ingreso para protegerte de reclamos</div>
+        <div class="solution-item">Presupuestos que se convierten en reparaciones</div>
+        <div class="solution-item">Sin internet, sin nubes, sin suscripciones</div>
+        <div class="solution-item">Funciona en Linux y Windows</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FUNCIONES ══ -->
+<section id="funciones">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label">Funcionalidades</div>
+      <h2 class="section-title">Todo lo que tu<br><span>taller necesita</span></h2>
+      <p class="section-sub" style="margin:0 auto">Sin complicaciones. Sin cursos. En minutos ya estas trabajando.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <span class="feature-icon">🔧</span>
+        <h3>Gestion de Reparaciones</h3>
+        <p>Codigo unico por equipo, seguimiento de estados (ingresado, en proceso, listo, entregado), recibos y formularios de responsabilidad.</p>
+        <span class="feature-tag">Core</span>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">📷</span>
+        <h3>Documentacion con Fotos</h3>
+        <p>Fotografiá el estado del equipo al ingreso y durante la reparacion. Las fotos quedan guardadas junto con cada orden.</p>
+        <span class="feature-tag">Nuevo</span>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">👥</span>
+        <h3>Base de Clientes</h3>
+        <p>Historial completo de cada cliente: equipos, reparaciones, comunicaciones y total facturado. Contacto directo por email.</p>
+        <span class="feature-tag">Core</span>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">💰</span>
+        <h3>Control Financiero</h3>
+        <p>Registro de cobros, gastos y calculo automatico de ganancia neta mensual. Sabe cuanto ganas de verdad.</p>
+        <span class="feature-tag">Core</span>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">📋</span>
+        <h3>Presupuestos</h3>
+        <p>Crea presupuestos profesionales y convertilo en reparacion con un clic si el cliente acepta.</p>
+        <span class="feature-tag">Core</span>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">🏪</span>
+        <h3>Proveedores y Compras</h3>
+        <p>Registra tus proveedores de repuestos y cada compra realizada. Los gastos se suman automaticamente al balance.</p>
+        <span class="feature-tag">Core</span>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">🌐</span>
+        <h3>Tres Idiomas</h3>
+        <p>Interfaz disponible en Espanol, Ingles y Portugues. Ideal para talleres en Argentina, Brasil o con clientes extranjeros.</p>
+        <span class="feature-tag">Nuevo</span>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">💾</span>
+        <h3>Backup de Datos</h3>
+        <p>Exporta todos tus datos a un archivo JSON en cualquier momento. Importalos en otra PC sin perder nada.</p>
+        <span class="feature-tag">Core</span>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">📴</span>
+        <h3>Sin Internet</h3>
+        <p>Funciona completamente offline. Tus datos son tuyos, en tu maquina. Sin nubes, sin subscripciones mensuales.</p>
+        <span class="feature-tag">Privacidad</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PLATAFORMAS ══ -->
+<section class="platforms-section" id="descargar">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label">Descarga</div>
+      <h2 class="section-title">Disponible para<br><span>Linux y Windows</span></h2>
+      <p class="section-sub" style="margin:0 auto">Descarga gratuita. 15 dias de prueba completa. Sin registrarse.</p>
+    </div>
+    <div class="platforms-grid reveal">
+      <div class="platform-card">
+        <span class="platform-icon">🐧</span>
+        <h3>Linux</h3>
+        <p>Compatible con cualquier distribucion: Ubuntu, Debian, Mint, Manjaro, BigLinux y mas. Archivo AppImage portable, no requiere instalacion.</p>
+        <div class="platform-badge">✓ AppImage portable</div>
+        <br><br>
+        <a href="https://drive.google.com/uc?export=download&id=1VAQ25s6kVnCKm5hi8l09JirDtVygdfKe" class="btn-primary" style="justify-content:center;" download>⬇ Descargar para Linux</a>
+      </div>
+      <div class="platform-card">
+        <span class="platform-icon">🪟</span>
+        <h3>Windows</h3>
+        <p>Compatible con Windows 10 y Windows 11. Instalador profesional con asistente paso a paso y acceso directo en el Escritorio.</p>
+        <div class="platform-badge">✓ Instalador .exe</div>
+        <br><br>
+        <a href="https://drive.google.com/uc?export=download&id=18AKWvzSW7ipxVGcSYL_bHbcXuvnrXEMO" class="btn-primary" style="justify-content:center;" download>⬇ Descargar para Windows</a>
+      </div>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:32px">
+      <a href="https://drive.google.com/uc?export=download&id=19T1AAZK1t65fpKU0unN3WVHIZcTz69ts" class="btn-secondary" style="display:inline-flex;margin:0 auto 16px;" download>
+        📄 Descargar Manual de Usuario (PDF)
+      </a>
+      <p style="font-size:13px;color:var(--muted)">
+        ¿Tenes dudas? Escribinos a
+        <a href="mailto:luialaran@gmail.com" style="color:var(--accent);text-decoration:none">luialaran@gmail.com</a>
+        y te ayudamos con la instalacion.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ COMO FUNCIONA ══ -->
+<section id="como-funciona">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label">Proceso</div>
+      <h2 class="section-title">En 4 pasos<br><span>estas trabajando</span></h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card reveal">
+        <div class="step-num">1</div>
+        <h4>Descarga</h4>
+        <p>Solicita el instalador por email y lo recibis en minutos. Sin formularios, sin registros.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">2</div>
+        <h4>Instala</h4>
+        <p>Doble clic en el instalador. En menos de 2 minutos TallerCell esta listo en tu PC.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">3</div>
+        <h4>Prueba</h4>
+        <p>15 dias completos para probar todas las funciones sin ninguna restriccion ni costo.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">4</div>
+        <h4>Activa</h4>
+        <p>Si te convence, compras la licencia y recibis tu clave por email. Pago unico, para siempre.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CONTEXTO ══ -->
+<section class="context-section">
+  <div class="container">
+    <div class="reveal">
+      <p class="context-quote">
+        "Hecho por un <span>tecnico reparador</span>,
+        para tecnicos reparadores."
+      </p>
+      <p style="color:var(--muted);font-size:15px;max-width:500px;margin:0 auto;line-height:1.6">
+        TallerCell nacio en Tandil, Argentina, de la necesidad real de ordenar un taller de reparaciones sin gastar en sistemas caros ni complicados.
+      </p>
+    </div>
+    <div class="context-tags reveal">
+      <span class="context-tag">📱 Celulares</span>
+      <span class="context-tag">💻 Notebooks</span>
+      <span class="context-tag">🖥 Computadoras</span>
+      <span class="context-tag">📷 Camaras</span>
+      <span class="context-tag">🎮 Consolas</span>
+      <span class="context-tag">⌚ Smartwatches</span>
+      <span class="context-tag">🔌 Electronica en general</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRICING ══ -->
+<section id="precios" class="pricing-section">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label">Precio</div>
+      <h2 class="section-title">Simple y<br><span>transparente</span></h2>
+      <p class="section-sub" style="margin:0 auto">Un solo pago. Sin sorpresas. Sin renovaciones.</p>
+    </div>
+    <div class="pricing-card reveal">
+      <div class="pricing-header">
+        <h3>Licencia Permanente</h3>
+        <p>Pago unico — Tuya para siempre</p>
+        <div class="pricing-price">$30.000<span> ARS</span></div>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px">Precio en pesos argentinos — consultar equivalencia en dolares</p>
+      </div>
+      <div class="pricing-body">
+        <div class="pricing-feature"><strong>15 dias de prueba gratuita</strong> — todas las funciones desbloqueadas</div>
+        <div class="pricing-feature"><strong>Licencia permanente</strong> — paga una vez, usa para siempre</div>
+        <div class="pricing-feature"><strong>Linux y Windows</strong> — una sola clave para ambas plataformas</div>
+        <div class="pricing-feature"><strong>Todas las funciones</strong> — reparaciones, fotos, clientes, finanzas</div>
+        <div class="pricing-feature"><strong>Actualizaciones incluidas</strong> — siempre la version mas reciente</div>
+        <div class="pricing-feature"><strong>Soporte por email</strong> — te ayudamos si tenes algun problema</div>
+        <a href="mailto:luialaran@gmail.com?subject=Quiero comprar TallerCell — Licencia $30000 ARS" class="pricing-cta">
+          Comprar licencia ahora →
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ══ -->
+<section id="faq" style="background:var(--surface)">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label">Preguntas</div>
+      <h2 class="section-title">Preguntas<br><span>frecuentes</span></h2>
+    </div>
+    <div class="faq-grid reveal">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          ¿Necesito internet para usar TallerCell?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">No. TallerCell funciona completamente sin conexion a internet. Todos tus datos se guardan en tu propia computadora y nunca salen de ella.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          ¿Que pasa cuando se vencen los 15 dias de prueba?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">La aplicacion muestra una pantalla de activacion y solicita una clave de licencia. Escribinos a luialaran@gmail.com, realizas el pago y te enviamos la clave por email. La activacion es instantanea.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          ¿Puedo usar TallerCell en mas de una computadora?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Si. Con una sola licencia podes instalar TallerCell en la computadora del taller y en tu netbook, por ejemplo. Los datos se pueden transferir entre equipos usando la funcion de backup.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          ¿Funciona en tablets o celulares Android?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">La version actual es para computadoras con Linux o Windows. La version para Android esta en desarrollo y estara disponible proximamente.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          ¿Mis datos estan seguros?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">100%. TallerCell no envia ningun dato a internet. Todo se guarda localmente en tu computadora. Vos tenes el control total de tu informacion.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          ¿Que incluye la licencia?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">La licencia incluye el uso permanente de la aplicacion, actualizaciones futuras y soporte por email. Es un pago unico sin renovaciones ni cargos adicionales.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          ¿Como recibo el instalador?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Escribinos a luialaran@gmail.com indicando tu sistema operativo (Linux o Windows) y te enviamos el archivo de instalacion por email en minutos.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA FINAL ══ -->
+<section class="cta-section" id="contacto">
+  <div class="container">
+    <div class="reveal">
+      <h2 class="cta-title">Empieza hoy.<br><span>Es gratis.</span></h2>
+      <p class="cta-sub">15 dias de prueba completa. Sin tarjeta de credito. Sin registros. Solo descarga y empieza a usarlo.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1">
+        <a href="https://drive.google.com/uc?export=download&id=1VAQ25s6kVnCKm5hi8l09JirDtVygdfKe" class="btn-primary" style="font-size:18px;padding:18px 40px" download>
+          ⬇ Descargar para Linux
+        </a>
+        <a href="https://drive.google.com/uc?export=download&id=18AKWvzSW7ipxVGcSYL_bHbcXuvnrXEMO" class="btn-primary" style="font-size:18px;padding:18px 40px;background:#2C4A7C;" download>
+          ⬇ Descargar para Windows
+        </a>
+      </div>
+      <a href="mailto:luialaran@gmail.com" class="cta-email">
+        📧 luialaran@gmail.com
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-logo">Taller<span>Cell</span></div>
+  <p class="footer-copy">© 2026 Luis Alberto Aranda — Tandil, Argentina. Todos los derechos reservados.</p>
+  <div class="footer-links">
+    <a href="#funciones">Funciones</a>
+    <a href="#precios">Precios</a>
+    <a href="mailto:luialaran@gmail.com">Contacto</a>
+  </div>
+</footer>
+
+<script>
+// FAQ
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      // Stagger children
+      e.target.querySelectorAll('.feature-card,.step-card,.problem-item,.platform-card').forEach((el,i) => {
+        el.style.transitionDelay = (i * 0.1) + 's';
+        el.classList.add('reveal','visible');
+      });
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Nav scroll effect
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  nav.style.borderBottomColor = window.scrollY > 50
+    ? 'rgba(245,166,35,0.2)'
+    : 'var(--border)';
+});
+</script>
+</body>
+</html>
